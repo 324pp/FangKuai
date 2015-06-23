@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">FangKuai</string>
+
+    <string name="newgame">新游戏</string>
+    <string name="action_settings">设置</string>
+    <string name="fenshu">分数:</string>
+    <string name="sudu">速度:</string>
+    <string name="xiayige">下一个方块:</string>
+</resources>

@@ -163,12 +163,12 @@ public class ClientView extends View {
     public boolean moveDown() {
         if (noFangKuai()) return false;
 
+        int r = 0;
         if (canDowm()) {
             fangKuai.Y++;
         }
         else {
             if (fangKuai.Y < 0) return true;  //game over
-            int r = 0;
             int fk[][] = fangKuai.getFangKuai();
             for (int i=0; i<fk.length; i++) {
                 if (fangKuai.Y + i < 0 || fangKuai.Y + i >= GlobeConfig.BGRows) continue;
@@ -180,9 +180,9 @@ public class ClientView extends View {
                 }
                 if (removeRow(fangKuai.Y + i)) r++;
             }
-            caloScore(r);
             fangKuai = null;
         }
+        caloScore(r);
         return false;
     }
 
@@ -230,7 +230,7 @@ public class ClientView extends View {
         for (int i=0; i<fk.length; i++) {
             int fk2[] = fk[i];
             for (int j=0; j<fk2.length; j++) {
-                if (fk2[j] == 0 || fangKuai.X + j < 0) continue;
+                if (fk2[j] == 0 /*|| fangKuai.X + j < 0*/) continue;
                 if (fangKuai.X + j < 1) return false;
                 if (groundBlock[fangKuai.Y + i][fangKuai.X + j - 1] != 0) return false;
             }
@@ -240,8 +240,8 @@ public class ClientView extends View {
 
     public boolean moveLeft() {
         if (noFangKuai()) return false;
-        if (canLeft())
-            fangKuai.X--;
+        if (canLeft() == false)  return false;
+        fangKuai.X--;
         return true;
     }
 
@@ -256,6 +256,7 @@ public class ClientView extends View {
             int fk2[] = fk[i];
             for (int j=0; j<fk2.length; j++) {
                 if (fk2[j] == 0) continue;
+                if (fangKuai.X + j >= GlobeConfig.BGColumns - 1) return false;
                 if (groundBlock[fangKuai.Y + i][fangKuai.X + j + 1] != 0) return false;
             }
         }
@@ -264,8 +265,8 @@ public class ClientView extends View {
 
     public boolean moveRight() {
         if (noFangKuai()) return false;
-        if (canRight())
-            fangKuai.X++;
+        if (canRight() == false) return false;
+        fangKuai.X++;
         return true;
     }
 
@@ -285,13 +286,13 @@ public class ClientView extends View {
                 if (fk2[j] == 0) continue;
                 boolean f = false;
                 while (fangKuai.X + j < 0) {
-                    if (moveLeft()) {
+                    if (moveRight()) {
                         f = true;
                         break;
                     }
                 }
                 while (fangKuai.X + j >= GlobeConfig.BGColumns) {
-                    if (moveRight()) {
+                    if (moveLeft()) {
                         f = true;
                         break;
                     }

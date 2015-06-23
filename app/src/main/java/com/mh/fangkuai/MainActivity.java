@@ -16,6 +16,7 @@ public class MainActivity extends ActionBarActivity {
 
     private RefreshHandler redrawHandler = new RefreshHandler();
     private ClientView CV;
+    private ClientView BLOCK;
     private boolean bLoop = true;
     private int downSpeed;
     private long score;
@@ -37,8 +38,13 @@ public class MainActivity extends ActionBarActivity {
 
     private void update() {
         if (CV.noFangKuai()) {
+            FangKuai F = BLOCK.getFangKuai();
+            F.X = GlobeConfig.BGColumns / 2 - 2;
+            F.Y = F.getButtonRow() * -1;
+            CV.setFangKuai(F);
             FangKuai fk = new FangKuai();
-            CV.setFangKuai(fk);
+            BLOCK.setFangKuai(fk);
+            BLOCK.reDraw();
         }
         boolean isover = CV.moveDown();
         if (CV.score > 0) setScore(CV.score);
@@ -48,7 +54,8 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void run() {
-        redrawHandler.sleep(700);
+        int s = GlobeConfig.BlockSpeed / 10;
+        redrawHandler.sleep(GlobeConfig.BlockSpeed - s * (downSpeed - 1));
     }
 
     public void newGame() {
@@ -57,6 +64,9 @@ public class MainActivity extends ActionBarActivity {
         score = 0;
         setSpeed(0);
         setScore(0);
+        FangKuai fk = new FangKuai();
+        BLOCK.setFangKuai(fk);
+        BLOCK.reDraw();
         run();
     }
 
@@ -74,10 +84,10 @@ public class MainActivity extends ActionBarActivity {
     private void setScore(long s) {
         TextView TV = (TextView)findViewById(R.id.fenshu);
         String t = TV.getText().toString();
-        if (s > 0) s = s + score;
-        TV.setText(s + "");
+        if (s > 0) score = s + score;
+        TV.setText(score + "");
         String t2 = TV.getText().toString();
-        if (t2.length() > t.length()) setSpeed(1);
+        if (s > 10000 && t2.length() > t.length()) setSpeed(1);
     }
 
     private void moveLeft() {
@@ -99,6 +109,7 @@ public class MainActivity extends ActionBarActivity {
     private void moveDown() {
         bLoop = false;
         CV.toDown();
+        if (CV.score > 0) setScore(CV.score);
         CV.reDraw();
         bLoop = true;
         run();
@@ -117,9 +128,11 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        redrawHandler.sleep(2000);
+        //redrawHandler.sleep(2000);
         initSpeed = 1;
         CV = (ClientView) findViewById(R.id.CV);
+        BLOCK = (ClientView) findViewById(R.id.nextBlock);
+        BLOCK.setBG(4, 4);
 
         Button button = (Button) findViewById(R.id.start);
         button.setOnClickListener(new View.OnClickListener() {

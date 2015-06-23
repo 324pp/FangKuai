@@ -18,6 +18,8 @@ import android.view.View;
 import org.w3c.dom.Text;
 
 public class ClientView extends View {
+    private int bgRows;
+    private int bgColumns;
     private int viewHeight;  //画布高度
     private int viewWidth;//画布宽度
     private int blockHeight;//块高度
@@ -40,34 +42,50 @@ public class ClientView extends View {
 
         linePaint = new Paint();
         blockPaint = new Paint();
-        groundBlock = new int[GlobeConfig.BGRows + 4][GlobeConfig.BGColumns + 4];
+
+        bgRows = GlobeConfig.BGRows;
+        bgColumns = GlobeConfig.BGColumns;
+
+        groundBlock = new int[bgRows + 4][bgColumns + 4];
+        Inital();
 
         linePaint.setColor(GlobeConfig.BGLineColor);
-        maxY = GlobeConfig.BGRows - 1;
+        maxY = bgRows - 1;
     };
 
 	public void Inital() {
-		for (int i=0; i<GlobeConfig.BGRows; i++) {
-			for (int j=0; j<GlobeConfig.BGColumns; j++) {
+		for (int i=0; i<bgRows; i++) {
+			for (int j=0; j<bgColumns; j++) {
 				groundBlock[i][j] = 0;
 			}
-			groundBlock[i][GlobeConfig.BGColumns] = 1;
+			groundBlock[i][bgColumns] = 1;
 		}
-        for (int i=0; i<GlobeConfig.BGColumns; i++) {
-            groundBlock[GlobeConfig.BGRows][i] = 1;
+        for (int i=0; i<bgColumns; i++) {
+            groundBlock[bgRows][i] = 1;
         }
 		fangKuai = null;
 	}
+
+    public void setBG(int row, int col) {
+        bgRows = row;
+        bgColumns = col;
+        Inital();
+        reDraw();
+    }
+
+    public FangKuai getFangKuai() {
+        return fangKuai;
+    };
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int h = MeasureSpec.getSize(heightMeasureSpec) - 8;//getHeight();
         int w  = MeasureSpec.getSize(widthMeasureSpec) - 8;//getWidth();
-        blockHeight = (int) Math.floor(h / GlobeConfig.BGRows);
-        blockWidth = (int) Math.floor(w / GlobeConfig.BGColumns);
+        blockHeight = (int) Math.floor(h / bgRows);
+        blockWidth = (int) Math.floor(w / bgColumns);
         blockBanJing = Math.min(blockHeight / 10, blockWidth / 10);
-        viewHeight = blockHeight * GlobeConfig.BGRows;
-        viewWidth = blockWidth * GlobeConfig.BGColumns;
+        viewHeight = blockHeight * bgRows;
+        viewWidth = blockWidth * bgColumns;
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
@@ -91,11 +109,11 @@ public class ClientView extends View {
 
     //画表格
     protected void drawGrid(Canvas canvas) {
-        for(int i=0; i<=GlobeConfig.BGColumns; i++) {
+        for(int i=0; i<=bgColumns; i++) {
             canvas.drawLine(i * blockWidth,0,i * blockWidth,viewHeight,linePaint);
         }
 
-        for(int i=0; i<=GlobeConfig.BGRows; i++) {
+        for(int i=0; i<=bgRows; i++) {
             canvas.drawLine(0,i * blockHeight,viewWidth,i * blockHeight,linePaint);
         }
     };
@@ -105,11 +123,11 @@ public class ClientView extends View {
 
         int fk[][] = fangKuai.getFangKuai();
         for (int i=0; i<fk.length; i++) {
-            if (fangKuai.Y + i < 0 || fangKuai.Y + i >= GlobeConfig.BGRows) continue;
+            if (fangKuai.Y + i < 0 || fangKuai.Y + i >= bgRows) continue;
 
             int fk2[] = fk[i];
             for (int j=0; j<fk2.length; j++) {
-                if (fangKuai.X + j < 0 || fangKuai.X + j >= GlobeConfig.BGColumns || fk2[j] == 0) continue;
+                if (fangKuai.X + j < 0 || fangKuai.X + j >= bgColumns || fk2[j] == 0) continue;
                 drawBlock(canvas, fangKuai.X + j, fangKuai.Y + i, fangKuai.color);
             }
         }
@@ -117,8 +135,8 @@ public class ClientView extends View {
 
     //画背景方块
     private void drawGround(Canvas canvas) {
-        for (int i=0; i<GlobeConfig.BGRows; i++) {
-            for (int j=0; j<GlobeConfig.BGColumns; j++) {
+        for (int i=0; i<bgRows; i++) {
+            for (int j=0; j<bgColumns; j++) {
                 if (groundBlock[i][j] == 0) continue;
                 drawBlock(canvas, j, i, groundBlock[i][j]);
             }
@@ -149,10 +167,10 @@ public class ClientView extends View {
 
         int fk[][] = fangKuai.getFangKuai();
         for (int i=0; i<fk.length; i++) {
-            if (fangKuai.Y + i < 0 || fangKuai.Y + i >= GlobeConfig.BGRows) continue;
+            if (fangKuai.Y + i < 0 || fangKuai.Y + i >= bgRows) continue;
             int fk2[] = fk[i];
             for (int j=0; j<fk2.length; j++) {
-                if (fangKuai.X + j < 0 || fangKuai.X + j >= GlobeConfig.BGColumns || fk2[j] == 0) continue;
+                if (fangKuai.X + j < 0 || fangKuai.X + j >= bgColumns || fk2[j] == 0) continue;
                 if (groundBlock[fangKuai.Y + i + 1][fangKuai.X + j] != 0) return false;
             }
         }
@@ -171,10 +189,10 @@ public class ClientView extends View {
             if (fangKuai.Y < 0) return true;  //game over
             int fk[][] = fangKuai.getFangKuai();
             for (int i=0; i<fk.length; i++) {
-                if (fangKuai.Y + i < 0 || fangKuai.Y + i >= GlobeConfig.BGRows) continue;
+                if (fangKuai.Y + i < 0 || fangKuai.Y + i >= bgRows) continue;
                 int fk2[] = fk[i];
                 for (int j=0; j<fk2.length; j++) {
-                    if (fangKuai.X + j < 0 || fangKuai.X + j >= GlobeConfig.BGColumns || fk2[j] == 0) continue;
+                    if (fangKuai.X + j < 0 || fangKuai.X + j >= bgColumns || fk2[j] == 0) continue;
                     maxY = Math.min(maxY, fangKuai.Y + i - 1);
                     groundBlock[fangKuai.Y + i][fangKuai.X + j] = fangKuai.color;
                 }
@@ -189,10 +207,10 @@ public class ClientView extends View {
     //计算分数
     private void caloScore(int row) {
         switch(row) {
-            case 1: score = 100;
-            case 2: score = 300;
-            case 3: score = 600;
-            case 4: score = 1000;
+            case 1: score = 100;break;
+            case 2: score = 300;break;
+            case 3: score = 600;break;
+            case 4: score = 1000;break;
             default: score = 0;
         }
     }
@@ -200,7 +218,7 @@ public class ClientView extends View {
     //消行
     private boolean removeRow(int row) {
         boolean f = true;
-        for (int i=0; i< GlobeConfig.BGColumns; i++) {
+        for (int i=0; i< bgColumns; i++) {
             if (groundBlock[row][i] == 0) {
                 f = false;
                 break;
@@ -208,7 +226,7 @@ public class ClientView extends View {
         }
         if (f) {
             for (int i=row; i>=0; i--) {
-                for (int j = 0; j < GlobeConfig.BGColumns; j++) {
+                for (int j = 0; j < bgColumns; j++) {
                     if (i == 0) {
                         groundBlock[i][j] = 0;
                     } else {
@@ -223,7 +241,7 @@ public class ClientView extends View {
     //向左
     private boolean canLeft() {
         if (noFangKuai()) return false;
-        if (fangKuai.X < -2) return false;
+        if (fangKuai.X < -2 || fangKuai.Y <= fangKuai.getTopRow() * -1) return false;
         if (fangKuai.Y + 3 < maxY && fangKuai.X > 0) return true;
 
         int fk[][] = fangKuai.getFangKuai();
@@ -248,15 +266,15 @@ public class ClientView extends View {
     //向右
     private boolean canRight() {
         if (noFangKuai()) return false;
-        if (fangKuai.X > GlobeConfig.BGColumns - 2) return false;
-        if (fangKuai.Y + 3 < maxY && fangKuai.X < GlobeConfig.BGColumns - 4) return true;
+        if (fangKuai.X > bgColumns - 2 || fangKuai.Y <= fangKuai.getTopRow() * -1) return false;
+        if (fangKuai.Y + 3 < maxY && fangKuai.X < bgColumns - 4) return true;
 
         int fk[][] = fangKuai.getFangKuai();
         for (int i=0; i<fk.length; i++) {
             int fk2[] = fk[i];
             for (int j=0; j<fk2.length; j++) {
                 if (fk2[j] == 0) continue;
-                if (fangKuai.X + j >= GlobeConfig.BGColumns - 1) return false;
+                if (fangKuai.X + j >= bgColumns - 1) return false;
                 if (groundBlock[fangKuai.Y + i][fangKuai.X + j + 1] != 0) return false;
             }
         }
@@ -271,13 +289,14 @@ public class ClientView extends View {
     }
 
     //变形
-    private boolean canChangeBlock() {
+    public boolean changeBlock() {
         if (noFangKuai()) return false;
-        if (fangKuai.Y + 3 < maxY && fangKuai.X > 0 && fangKuai.X < GlobeConfig.BGColumns - 4) return true;
 
         int tmpX = fangKuai.X;
         int tmpS = fangKuai.getStatus();
         fangKuai.setChange();
+
+        if (fangKuai.Y + 3 < maxY && fangKuai.X > 0 && fangKuai.X < bgColumns - 4) return true;
 
         int fk[][] = fangKuai.getFangKuai();
         for (int i=0; i<fk.length; i++) {
@@ -286,20 +305,19 @@ public class ClientView extends View {
                 if (fk2[j] == 0) continue;
                 boolean f = false;
                 while (fangKuai.X + j < 0) {
-                    if (moveRight()) {
+                    if (moveRight() == false) {
                         f = true;
                         break;
                     }
                 }
-                while (fangKuai.X + j >= GlobeConfig.BGColumns) {
-                    if (moveLeft()) {
+                while (fangKuai.X + j >= bgColumns) {
+                    if (moveLeft() == false) {
                         f = true;
                         break;
                     }
                 }
-                if (fangKuai.X + j < 0 || groundBlock[fangKuai.Y + i][fangKuai.X + j] != 0) {
+                if (groundBlock[fangKuai.Y + i][fangKuai.X + j] != 0) {
                     f = true;
-                    break;
                 }
                 if (f) {
                     fangKuai.X = tmpX;
@@ -308,15 +326,6 @@ public class ClientView extends View {
                 }
             }
         }
-        fangKuai.X = tmpX;
-        fangKuai.setStatus(tmpS);
-        return true;
-    }
-
-    public boolean changeBlock() {
-        if (noFangKuai()) return false;
-        if (canChangeBlock())
-            fangKuai.setChange();
         return true;
     }
 

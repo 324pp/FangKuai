@@ -83,27 +83,30 @@ public class MainActivity extends ActionBarActivity {
 
     private void setScore(long s) {
         TextView TV = (TextView)findViewById(R.id.fenshu);
-        String t = TV.getText().toString();
         if (s > 0) score = s + score;
         TV.setText(score + "");
-        String t2 = TV.getText().toString();
-        if (s > 10000 && t2.length() > t.length()) setSpeed(1);
+        int t = (int)score / 10000;
+        if (t > downSpeed) setSpeed(1);
     }
 
     private void moveLeft() {
-        bLoop = false;
-        CV.moveLeft();
-        CV.reDraw();
-        bLoop = true;
-        run();
+        if (CV.isAllDown()) {
+            bLoop = false;
+            CV.moveLeft();
+            CV.reDraw();
+            bLoop = true;
+            run();
+        }
     }
 
     private void moveRight() {
-        bLoop = false;
-        CV.moveRight();
-        CV.reDraw();
-        bLoop = true;
-        run();
+        if (CV.isAllDown()) {
+            bLoop = false;
+            CV.moveRight();
+            CV.reDraw();
+            bLoop = true;
+            run();
+        }
     }
 
     private void moveDown() {
@@ -116,11 +119,13 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void changeBlock() {
-        bLoop = false;
-        CV.changeBlock();
-        CV.reDraw();
-        bLoop = true;
-        run();
+        if (CV.isAllDown()) {
+            bLoop = false;
+            CV.changeBlock();
+            CV.reDraw();
+            bLoop = true;
+            run();
+        }
     }
 
     @Override

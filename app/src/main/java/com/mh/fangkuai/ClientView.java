@@ -238,6 +238,11 @@ public class ClientView extends View {
         return f;
     }
 
+    //是否全部出来
+    public boolean isAllDown() {
+        return (fangKuai.Y <= fangKuai.getTopRow() * -1) ? false : true;
+    }
+
     //向左
     private boolean canLeft() {
         if (noFangKuai()) return false;
